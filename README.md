@@ -1,88 +1,88 @@
 # brachan
 
-Imageboard/chan simples, desenvolvido em Rust, com foco em simplicidade, performance e facilidade de manutenção.
+A simple imageboard/chan built in Rust, focused on simplicity, performance and ease of maintenance.
 
-## Objetivo
+## Goal
 
-Plataforma no estilo imageboard com:
+An imageboard-style platform with:
 
-- Criação de boards
-- Criação de threads
-- Respostas em threads
-- Upload de imagens
-- Paginação e limite de bump
-- Moderação e exclusão de posts
-- Proteção contra spam e abuso
+- Board creation
+- Thread creation
+- Thread replies
+- Image uploads
+- Pagination and bump limit
+- Moderation and post deletion
+- Spam and abuse protection
 
-O projeto começa simples e evolui conforme necessário. Sem overengineering.
+The project starts simple and evolves as needed. No overengineering.
 
 ## Stack
 
 **Backend**
 
 - Rust
-- [Axum](https://github.com/tokio-rs/axum) — framework HTTP
+- [Axum](https://github.com/tokio-rs/axum) — HTTP framework
 - Tokio — async runtime
-- SQLx — acesso ao banco de dados
-- PostgreSQL — banco de dados
+- SQLx — database access
+- PostgreSQL — database
 
 **Frontend**
 
-- HTML, CSS e JavaScript vanilla
-- Renderização server-side (SSR)
-- Templates via Askama ou Maud
+- HTML, CSS and vanilla JavaScript
+- Server-side rendering (SSR)
+- Templates via Askama or Maud
 
-**Infraestrutura**
+**Infrastructure**
 
-- Docker e Docker Compose (desenvolvimento)
-- Storage local inicialmente, S3 no futuro
+- Docker and Docker Compose (development)
+- Local storage initially, S3 in the future
 
-## Estrutura
+## Layout
 
 ```
 zahard/
 ├── src/
-│   ├── main.rs        # bootstrap do servidor
-│   ├── routes/        # registro de rotas
-│   └── infra/         # controllers e acesso externo
+│   ├── main.rs        # server bootstrap
+│   ├── routes/        # route registration
+│   └── infra/         # controllers and external access
 │       └── controlller/
 ├── Cargo.toml
 └── Cargo.lock
 ```
 
-Fluxo:
+Flow:
 
 ```
 HTTP Request → Axum → Handler → Service → DB / Storage
 ```
 
-Handlers cuidam do HTTP. Regras de negócio ficam nos services.
+Handlers deal with HTTP. Business rules live in services.
 
-## Rotas
+## Routes
 
 ```
 GET  /                     # Home
 GET  /:board               # Board
 GET  /:board/thread/:id    # Thread
 
-POST /:board/thread        # Criar thread
-POST /:board/thread/:id    # Criar resposta
+POST /:board/thread        # Create thread
+POST /:board/thread/:id    # Create reply
 
-POST /mod/delete/:id       # Deletar post
+POST /mod/delete/:id       # Delete post
 ```
 
-A estrutura pode mudar conforme o projeto evolui.
+The structure may change as the project evolves.
 
-## Desenvolvimento
+## Development
 
 ```bash
-# Rodar
+# Run
 cargo run
 
-# Testes
+# Tests
 cargo test
 
-# Formatação
+# Formatting
 cargo fmt
 
 # Linter
@@ -92,33 +92,33 @@ cargo clippy
 cargo build --release
 ```
 
-Todas as rotas acima são executadas dentro de `zahard/`.
+All commands above run inside `zahard/`.
 
-A CI roda `cargo fmt --check`, `cargo clippy --deny warnings`, `cargo test` e `cargo doc` a cada push.
+CI runs `cargo fmt --check`, `cargo clippy --deny warnings`, `cargo test` and `cargo doc` on every push.
 
-## Banco de dados
+## Database
 
-PostgreSQL é a fonte principal de dados. Alterações de schema usam migrations em `migrations/`. Nunca alterar o banco em produção sem a migration correspondente.
+PostgreSQL is the primary source of data. Schema changes use migrations in `migrations/`. Never change the database in production without a matching migration.
 
-## Segurança
+## Security
 
-Uploads são tratados como conteúdo não confiável. Conforme necessário:
+Uploads are treated as untrusted content. As needed:
 
-- Rate limiting e controle de flood
-- Limite de tamanho e validação de MIME type
-- Sanitização/escape de conteúdo
-- Hash de IP para mecanismos de moderação
-- Validação de todos os inputs
-- Headers de segurança e CSRF
+- Rate limiting and flood control
+- Upload size limits and MIME type validation
+- Content sanitization/escaping
+- IP hashing for moderation mechanisms
+- Validation of all inputs
+- Security headers and CSRF
 
-## Princípios
+## Principles
 
-- Código simples, sem abstrações prematuras
-- Soluções idiomáticas de Rust
-- Sem dependências sem necessidade
-- SSR antes de framework frontend
-- Toda funcionalidade nova considera segurança e abuso
+- Simple code, no premature abstractions
+- Idiomatic Rust
+- No unnecessary dependencies
+- SSR before adding a frontend framework
+- Every new feature considers security and abuse
 
-## Licença
+## License
 
 MIT
