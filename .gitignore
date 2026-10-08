@@ -1,5 +1,6 @@
 target/
 **/target/
+context_project.md
 
 .env
 .env.*
