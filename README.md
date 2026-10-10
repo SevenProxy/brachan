@@ -23,7 +23,7 @@ The project starts simple and evolves as needed. No overengineering.
 - Rust
 - [Axum](https://github.com/tokio-rs/axum) — HTTP framework
 - Tokio — async runtime
-- SQLx — database access
+- [SeaORM](https://www.sea-orm.org/) — ORM + `sea-orm-migration` (migrations)
 - PostgreSQL — database
 
 **Frontend**
@@ -42,10 +42,12 @@ The project starts simple and evolves as needed. No overengineering.
 ```
 zahard/
 ├── src/
-│   ├── main.rs        # server bootstrap
+│   ├── main.rs        # server bootstrap (runs DB migrations on startup)
 │   ├── routes/        # route registration
-│   └── infra/         # controllers and external access
-│       └── controlller/
+│   └── infra/         # controllers, external access and database
+│       ├── controlller/
+│       └── database/  # SeaORM connection + migration runner
+├── migrations/        # SQL migrations (embedded in the binary)
 ├── Cargo.toml
 └── Cargo.lock
 ```
@@ -98,7 +100,17 @@ CI runs `cargo fmt --check`, `cargo clippy --deny warnings`, `cargo test` and `c
 
 ## Database
 
-PostgreSQL is the primary source of data. Schema changes use migrations in `migrations/`. Never change the database in production without a matching migration.
+PostgreSQL is the primary source of data. Schema changes use SQL migrations in `migrations/`. Never change the database in production without a matching migration.
+
+The migrations are embedded in the binary and applied automatically at startup (`infra::database::connect`). `sea-orm-migration` tracks applied migrations in the `seaql_migrations` table, so only pending ones run on every boot.
+
+Set the connection string before running:
+
+```bash
+export DATABASE_URL=postgres://postgres:postgres@localhost:5432/brachan
+```
+
+or copy `.env.example` to `.env` (loaded via `dotenvy`).
 
 ## Security
 
