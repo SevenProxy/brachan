@@ -1,4 +1,5 @@
 mod core;
+mod error;
 mod infra;
 mod routes;
 
