@@ -1,4 +1,5 @@
 mod migrations;
+mod repository;
 
 use sea_orm::{Database, DatabaseConnection, DbErr};
 use sea_orm_migration::MigratorTrait;
