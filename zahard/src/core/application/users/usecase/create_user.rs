@@ -1,15 +1,23 @@
-use std::sync::Arc;
-use sea_orm::{ActiveValue::{NotSet, Set}, prelude::DateTimeWithTimeZone};
 use chrono::Utc;
+use sea_orm::{
+    ActiveValue::{NotSet, Set},
+    prelude::DateTimeWithTimeZone,
+};
+use std::sync::Arc;
 
-use crate::{core::{
-    application::users::dto::CreateUserInput, domain::users::{
-        entities::{Model, ActiveModel}, repositories::UsersRepository,
+use crate::{
+    core::{
+        application::users::dto::CreateUserInput,
+        domain::users::{
+            entities::{ActiveModel, Model},
+            repositories::UsersRepository,
+        },
     },
-}, error::AppError};
+    error::AppError,
+};
 
 pub struct CreateUser {
-    repository: Arc<dyn UsersRepository + Send + Sync>
+    repository: Arc<dyn UsersRepository + Send + Sync>,
 }
 
 impl CreateUser {
@@ -28,7 +36,7 @@ impl CreateUser {
             password: Set(model_user.password),
             role: Set("user".to_string()),
             is_active: Set(true),
-            created_at: Set(self.today())
+            created_at: Set(self.today()),
         };
 
         self.repository.create(model).await

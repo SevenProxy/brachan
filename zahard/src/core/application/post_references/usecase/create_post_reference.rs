@@ -1,10 +1,7 @@
 use std::sync::Arc;
 
 use chrono::Utc;
-use sea_orm::{
-    ActiveValue::{NotSet, Set},
-    prelude::DateTimeWithTimeZone,
-};
+use sea_orm::{ActiveValue::Set, prelude::DateTimeWithTimeZone};
 
 use crate::{
     core::{
