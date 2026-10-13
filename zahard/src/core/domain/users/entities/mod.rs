@@ -8,7 +8,7 @@ pub struct Model {
     pub id: i64,
     #[sea_orm(unique)]
     pub username: String,
-    pub password_hash: String,
+    pub password: String,
     pub role: String,
     pub is_active: bool,
     pub created_at: DateTimeWithTimeZone,
