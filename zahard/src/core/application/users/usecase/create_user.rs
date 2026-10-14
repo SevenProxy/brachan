@@ -39,12 +39,17 @@ impl CreateUser {
 
     pub async fn execute(&self, model_user: CreateUserInput) -> Result<Model, AppError> {
         let password = self.hash_password(&model_user.password)?;
+        let role = if self.repository.count().await? == 0 {
+            "admin"
+        } else {
+            "user"
+        };
 
         let model = ActiveModel {
             id: NotSet,
             username: Set(model_user.username),
             password: Set(password),
-            role: Set("user".to_string()),
+            role: Set(role.to_string()),
             is_active: Set(true),
             created_at: Set(self.today()),
         };

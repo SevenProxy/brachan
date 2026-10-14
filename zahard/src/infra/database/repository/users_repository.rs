@@ -1,8 +1,8 @@
-use sea_orm::{ActiveModelTrait, DatabaseConnection};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, PaginatorTrait};
 
 use crate::{
     core::domain::users::{
-        entities::{ActiveModel, Model},
+        entities::{ActiveModel, Entity, Model},
         repositories::UsersRepository,
     },
     error::AppError,
@@ -25,5 +25,12 @@ impl UsersRepository for UsersRepositoryImpl {
             Ok(model) => Ok(model),
             Err(_) => Err(AppError::Validation("Failed to create user.".to_string())),
         }
+    }
+
+    async fn count(&self) -> Result<u64, AppError> {
+        Entity::find()
+            .count(&self.db)
+            .await
+            .map_err(|error| AppError::Internal(anyhow::Error::new(error)))
     }
 }
