@@ -1,8 +1,10 @@
-use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, PaginatorTrait};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, PaginatorTrait, QueryFilter,
+};
 
 use crate::{
     core::domain::users::{
-        entities::{ActiveModel, Entity, Model},
+        entities::{ActiveModel, Column, Entity, Model},
         repositories::UsersRepository,
     },
     error::AppError,
@@ -27,8 +29,9 @@ impl UsersRepository for UsersRepositoryImpl {
         }
     }
 
-    async fn count(&self) -> Result<u64, AppError> {
+    async fn count_by_role(&self, role: &str) -> Result<u64, AppError> {
         Entity::find()
+            .filter(Column::Role.eq(role))
             .count(&self.db)
             .await
             .map_err(|error| AppError::Internal(anyhow::Error::new(error)))
