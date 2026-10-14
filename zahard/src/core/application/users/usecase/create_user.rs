@@ -1,3 +1,4 @@
+use argon2::{Argon2, password_hash::PasswordHasher};
 use chrono::Utc;
 use sea_orm::{
     ActiveValue::{NotSet, Set},
@@ -29,11 +30,20 @@ impl CreateUser {
         Utc::now().fixed_offset()
     }
 
+    fn hash_password(&self, password: &str) -> Result<String, AppError> {
+        Argon2::default()
+            .hash_password(password.as_bytes())
+            .map(|hash| hash.to_string())
+            .map_err(|error| AppError::Internal(anyhow::Error::new(error)))
+    }
+
     pub async fn execute(&self, model_user: CreateUserInput) -> Result<Model, AppError> {
+        let password = self.hash_password(&model_user.password)?;
+
         let model = ActiveModel {
             id: NotSet,
             username: Set(model_user.username),
-            password: Set(model_user.password),
+            password: Set(password),
             role: Set("user".to_string()),
             is_active: Set(true),
             created_at: Set(self.today()),
