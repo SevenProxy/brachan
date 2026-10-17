@@ -7,7 +7,7 @@ use std::sync::Arc;
 
 use crate::{
     core::{
-        application::users::{dto::CreateUserInput, password::hash_password},
+        application::users::{dto::UserInput, password::hash_password},
         domain::users::{
             entities::{ActiveModel, Model},
             repositories::UsersRepository,
@@ -29,7 +29,7 @@ impl CreateUser {
         Utc::now().fixed_offset()
     }
 
-    pub async fn execute(&self, model_user: CreateUserInput) -> Result<Model, AppError> {
+    pub async fn execute(&self, model_user: UserInput) -> Result<Model, AppError> {
         let password = hash_password(&model_user.password)?;
 
         let model = ActiveModel {

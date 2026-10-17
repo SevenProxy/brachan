@@ -3,9 +3,12 @@ use sea_orm::{
 };
 
 use crate::{
-    core::domain::users::{
-        entities::{ActiveModel, Column, Entity, Model},
-        repositories::UsersRepository,
+    core::{
+        application::users::password::verify_password,
+        domain::users::{
+            entities::{ActiveModel, Column, Entity, Model},
+            repositories::UsersRepository,
+        },
     },
     error::AppError,
 };
@@ -35,5 +38,20 @@ impl UsersRepository for UsersRepositoryImpl {
             .count(&self.db)
             .await
             .map_err(|error| AppError::Internal(anyhow::Error::new(error)))
+    }
+
+    async fn auth(&self, username: String, password: String) -> Result<Model, AppError> {
+        let user = Entity::find()
+            .filter(Column::Username.eq(username.as_str()))
+            .one(&self.db)
+            .await
+            .map_err(|error| AppError::Internal(anyhow::Error::new(error)))?
+            .ok_or(AppError::Unauthorized)?;
+
+        if verify_password(&password, &user.password)? {
+            Ok(user)
+        } else {
+            Err(AppError::Unauthorized)
+        }
     }
 }

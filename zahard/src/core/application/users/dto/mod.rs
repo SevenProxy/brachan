@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 #[derive(Deserialize)]
-pub struct CreateUserInput {
+pub struct UserInput {
     pub username: String,
     pub password: String,
 }
