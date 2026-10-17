@@ -1,11 +1,25 @@
-use crate::infra::controlller::BoardController;
+use axum::{Router, routing::post};
 
-use axum::{Router, routing::get};
+use crate::{
+    infra::controlller::{
+        BoardController, ImageController, PostController, PostReferenceController,
+        ThreadController, UserController,
+    },
+    state::AppState,
+};
 
 pub struct AppChan;
 
 impl AppChan {
-    pub fn routes() -> Router {
-        Router::new().route("/create-board", get(BoardController::create))
+    pub fn routes(state: AppState) -> Router {
+        Router::new()
+            .route("/boards", post(BoardController::create))
+            .route("/images", post(ImageController::create))
+            .route("/threads", post(ThreadController::create))
+            .route("/posts", post(PostController::create))
+            .route("/post-references", post(PostReferenceController::create))
+            .route("/users", post(UserController::create))
+            .route("/login", post(UserController::login))
+            .with_state(state)
     }
 }
