@@ -30,6 +30,15 @@ impl CreateUser {
     }
 
     pub async fn execute(&self, model_user: UserInput) -> Result<Model, AppError> {
+        let existing = self
+            .repository
+            .find_by_username(model_user.username.clone())
+            .await?;
+
+        if existing.is_some() {
+            return Err(AppError::Conflict("Username already taken".to_string()));
+        }
+
         let password = hash_password(&model_user.password)?;
 
         let model = ActiveModel {

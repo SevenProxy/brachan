@@ -1,7 +1,10 @@
 use std::sync::Arc;
 
 use crate::{
-    core::{application::users::dto::UserInput, domain::users::repositories::UsersRepository},
+    core::{
+        application::users::{dto::UserInput, token::generate_token},
+        domain::users::repositories::UsersRepository,
+    },
     error::AppError,
 };
 
@@ -20,6 +23,6 @@ impl LoginUser {
             .auth(user_login.username, user_login.password)
             .await?;
 
-        Ok(user.username)
+        generate_token(&user)
     }
 }

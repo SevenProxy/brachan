@@ -14,6 +14,9 @@ pub enum AppError {
     #[error("Invalid data: {0}")]
     Validation(String),
 
+    #[error("Conflict: {0}")]
+    Conflict(String),
+
     #[error("Unauthorized")]
     Unauthorized,
 
@@ -42,6 +45,12 @@ impl IntoResponse for AppError {
             AppError::Validation(msg) => (
                 StatusCode::BAD_REQUEST,
                 "Invalid Data".to_string(),
+                Some(msg.clone()),
+            ),
+
+            AppError::Conflict(msg) => (
+                StatusCode::CONFLICT,
+                "Conflict".to_string(),
                 Some(msg.clone()),
             ),
 

@@ -4,13 +4,11 @@ use sea_orm::{
 
 use crate::{
     core::{
-        application::users::password::verify_password,
-        domain::users::{
+        application::users::password::{self, verify_password}, domain::users::{
             entities::{ActiveModel, Column, Entity, Model},
             repositories::UsersRepository,
         },
-    },
-    error::AppError,
+    }, error::AppError,
 };
 
 pub struct UsersRepositoryImpl {
@@ -28,7 +26,17 @@ impl UsersRepository for UsersRepositoryImpl {
     async fn create(&self, new_user: ActiveModel) -> Result<Model, AppError> {
         match new_user.insert(&self.db).await {
             Ok(model) => Ok(model),
-            Err(_) => Err(AppError::Validation("Failed to create user.".to_string())),
+            Err(e) => {
+                let err_str = e.to_string();
+                if err_str.contains("duplicate")
+                    || err_str.contains("unique")
+                    || err_str.contains("UNIQUE")
+                    || err_str.contains("23505")
+                {
+                    return Err(AppError::Conflict("Username already taken".to_string()));
+                }
+                Err(AppError::Internal(anyhow::Error::new(e)))
+            }
         }
     }
 
@@ -53,5 +61,13 @@ impl UsersRepository for UsersRepositoryImpl {
         } else {
             Err(AppError::Unauthorized)
         }
+    }
+
+    async fn find_by_username(&self, username: String) -> Result<Option<Model>, AppError> {
+        Entity::find()
+            .filter(Column::Username.eq(username.as_str()))
+            .one(&self.db)
+            .await
+            .map_err(|error| AppError::Internal(anyhow::Error::new(error)))
     }
 }
