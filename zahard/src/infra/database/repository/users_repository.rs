@@ -4,11 +4,13 @@ use sea_orm::{
 
 use crate::{
     core::{
-        application::users::password::{self, verify_password}, domain::users::{
+        application::users::password::verify_password,
+        domain::users::{
             entities::{ActiveModel, Column, Entity, Model},
             repositories::UsersRepository,
         },
-    }, error::AppError,
+    },
+    error::AppError,
 };
 
 pub struct UsersRepositoryImpl {
