@@ -7,12 +7,6 @@ pub struct UserInput {
 }
 
 #[derive(Deserialize)]
-pub struct UpdateUserInput {
-    pub id: i64,
-    pub update: UpdateUserApplication,
-}
-
-#[derive(Deserialize)]
 pub struct UpdateUserApplication {
     pub username: Option<String>,
     pub password: Option<String>,

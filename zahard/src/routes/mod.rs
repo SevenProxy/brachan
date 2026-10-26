@@ -1,6 +1,6 @@
 use axum::{
     Router,
-    routing::{post, put},
+    routing::{patch, post},
 };
 
 use crate::{
@@ -22,8 +22,8 @@ impl AppChan {
             .route("/posts", post(PostController::create))
             .route("/post-references", post(PostReferenceController::create))
             .route("/users", post(UserController::create))
-            .route("/users", put(UserController::update))
-            .route("/login", post(UserController::login))
+            .route("/users/{id}", patch(UserController::update))
+            .route("/users/login", post(UserController::login))
             .with_state(state)
     }
 }

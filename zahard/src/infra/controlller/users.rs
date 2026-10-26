@@ -1,9 +1,13 @@
-use axum::{Json, extract::State, http::StatusCode};
+use axum::{
+    Json,
+    extract::{Path, State},
+    http::StatusCode,
+};
 
 use crate::{
     core::{
         application::users::{
-            dto::{UpdateUserInput, UserInput},
+            dto::{UpdateUserApplication, UserInput},
             usecase::{create_user::CreateUser, login_user::LoginUser, update_user::UpdateUser},
         },
         domain::users::entities::Model,
@@ -35,12 +39,11 @@ impl UserController {
 
     pub async fn update(
         State(state): State<AppState>,
-        Json(input): Json<UpdateUserInput>,
+        Path(id): Path<i64>,
+        Json(input): Json<UpdateUserApplication>,
     ) -> Result<Json<Model>, AppError> {
-        let update = UpdateUser::new(state.users)
-            .execute(input.id, input.update)
-            .await?;
+        let user = UpdateUser::new(state.users).execute(id, input).await?;
 
-        Ok(Json(update))
+        Ok(Json(user))
     }
 }
