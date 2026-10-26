@@ -1,4 +1,7 @@
-use axum::{Router, routing::post};
+use axum::{
+    Router,
+    routing::{post, put},
+};
 
 use crate::{
     infra::controlller::{
@@ -19,6 +22,7 @@ impl AppChan {
             .route("/posts", post(PostController::create))
             .route("/post-references", post(PostReferenceController::create))
             .route("/users", post(UserController::create))
+            .route("/users", put(UserController::update))
             .route("/login", post(UserController::login))
             .with_state(state)
     }
