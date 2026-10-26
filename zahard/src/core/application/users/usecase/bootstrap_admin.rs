@@ -52,3 +52,46 @@ impl BootstrapAdmin {
         self.repository.create(model).await.map(Some)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use super::BootstrapAdmin;
+    use crate::core::application::users::{
+        password::verify_password,
+        usecase::test_support::{MockUsersRepository, make_user},
+    };
+
+    #[tokio::test]
+    async fn skips_bootstrap_when_an_admin_exists() {
+        let repository = Arc::new(MockUsersRepository::with_users(vec![make_user(
+            1, "admin", "hash", "admin", true,
+        )]));
+
+        let created = BootstrapAdmin::new(repository).execute().await.unwrap();
+
+        assert!(created.is_none());
+    }
+
+    #[tokio::test]
+    async fn creates_an_admin_from_the_environment() {
+        unsafe {
+            std::env::set_var("ADMIN_USERNAME", "root");
+            std::env::set_var("ADMIN_PASSWORD", "secret");
+        }
+        let repository = Arc::new(MockUsersRepository::new());
+
+        let admin = BootstrapAdmin::new(repository.clone())
+            .execute()
+            .await
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(admin.username, "root");
+        assert_eq!(admin.role, "admin");
+        assert!(admin.is_active);
+        assert!(verify_password("secret", &admin.password).unwrap());
+        assert_eq!(repository.users().len(), 1);
+    }
+}

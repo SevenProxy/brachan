@@ -42,6 +42,13 @@ impl UsersRepository for UsersRepositoryImpl {
         }
     }
 
+    async fn update(&self, update: ActiveModel) -> Result<Model, AppError> {
+        update
+            .update(&self.db)
+            .await
+            .map_err(|error| AppError::Internal(anyhow::Error::new(error)))
+    }
+
     async fn count_by_role(&self, role: &str) -> Result<u64, AppError> {
         Entity::find()
             .filter(Column::Role.eq(role))
@@ -68,6 +75,13 @@ impl UsersRepository for UsersRepositoryImpl {
     async fn find_by_username(&self, username: String) -> Result<Option<Model>, AppError> {
         Entity::find()
             .filter(Column::Username.eq(username.as_str()))
+            .one(&self.db)
+            .await
+            .map_err(|error| AppError::Internal(anyhow::Error::new(error)))
+    }
+
+    async fn find_by_id(&self, id: i64) -> Result<Option<Model>, AppError> {
+        Entity::find_by_id(id)
             .one(&self.db)
             .await
             .map_err(|error| AppError::Internal(anyhow::Error::new(error)))
